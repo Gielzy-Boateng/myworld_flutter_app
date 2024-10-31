@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1087011563193",
+    "project_id": "myworld-2024-greatest-project",
+    "storage_bucket": "myworld-2024-greatest-project.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1087011563193:android:9d7dfe618176da49361d68",
+        "android_client_info": {
+          "package_name": "com.boat.myworld"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB8QM6AMI0OQK7jEyoHIzaBWS5-dhZ13To"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
