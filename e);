@@ -1,0 +1,119 @@
+[1mdiff --git a/lib/main.dart b/lib/main.dart[m
+[1mindex 7b5b750..80761fe 100644[m
+[1m--- a/lib/main.dart[m
+[1m+++ b/lib/main.dart[m
+[36m@@ -3,6 +3,8 @@[m [mimport 'package:firebase_core/firebase_core.dart';[m
+ import 'package:flutter/material.dart';[m
+ import 'package:myworld/views/login_view.dart';[m
+ import 'package:myworld/views/register_view.dart';[m
+[32m+[m[32mimport 'package:myworld/views/verify_email_view.dart';[m
+[32m+[m[32mimport 'dart:developer' as devtools show log;[m
+ [m
+ import 'firebase_options.dart';[m
+ [m
+[36m@@ -37,8 +39,16 @@[m [mclass HomePage extends StatelessWidget {[m
+       builder: (context, snapshot) {[m
+         switch (snapshot.connectionState) {[m
+           case ConnectionState.done:[m
+[31m-            return const LoginView();[m
+[31m-          // final user = FirebaseAuth.instance.currentUser;[m
+[32m+[m[32m            final user = FirebaseAuth.instance.currentUser;[m
+[32m+[m[32m            if (user != null) {[m
+[32m+[m[32m              if (user.emailVerified) {[m
+[32m+[m[32m                return const NotesView();[m
+[32m+[m[32m              } else {[m
+[32m+[m[32m                return const VerifyEmailView();[m
+[32m+[m[32m              }[m
+[32m+[m[32m            } else {[m
+[32m+[m[32m              return const LoginView();[m
+[32m+[m[32m            }[m
+           // if (user?.emailVerified ?? false) {[m
+           // print('User is verified');[m
+           // return const Text('Done');[m
+[36m@@ -58,3 +68,72 @@[m [mclass HomePage extends StatelessWidget {[m
+     );[m
+   }[m
+ }[m
+[32m+[m
+[32m+[m[32menum MenuAction { logout }[m
+[32m+[m
+[32m+[m[32mclass NotesView extends StatefulWidget {[m
+[32m+[m[32m  const NotesView({super.key});[m
+[32m+[m
+[32m+[m[32m  @override[m
+[32m+[m[32m  State<NotesView> createState() => _NotesViewState();[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mclass _NotesViewState extends State<NotesView> {[m
+[32m+[m[32m  @override[m
+[32m+[m[32m  Widget build(BuildContext context) {[m
+[32m+[m[32m    return Scaffold([m
+[32m+[m[32m      appBar: AppBar([m
+[32m+[m[32m        title: const Text('Main Ui'),[m
+[32m+[m[32m        backgroundColor: Colors.blue,[m
+[32m+[m[32m        actions: [[m
+[32m+[m[32m          PopupMenuButton<MenuAction>([m
+[32m+[m[32m            onSelected: (value) async {[m
+[32m+[m[32m              switch (value) {[m
+[32m+[m[32m                case MenuAction.logout:[m
+[32m+[m[32m                  final shouldLogout = await showLogoutDialog(context);[m
+[32m+[m[32m                  if (shouldLogout) {[m
+[32m+[m[32m                    await FirebaseAuth.instance.signOut();[m
+[32m+[m[32m                    Navigator.of(context)[m
+[32m+[m[32m                        .pushNamedAndRemoveUntil('/login/', (_) => false);[m
+[32m+[m[32m                  }[m
+[32m+[m[32m              }[m
+[32m+[m[32m            },[m
+[32m+[m[32m            itemBuilder: (context) {[m
+[32m+[m[32m              return const [[m
+[32m+[m[32m                PopupMenuItem<MenuAction>([m
+[32m+[m[32m                  value: MenuAction.logout,[m
+[32m+[m[32m                  child: Text('Log out'),[m
+[32m+[m[32m                )[m
+[32m+[m[32m              ];[m
+[32m+[m[32m            },[m
+[32m+[m[32m          )[m
+[32m+[m[32m        ],[m
+[32m+[m[32m      ),[m
+[32m+[m[32m      body: const Text('Hello World'),[m
+[32m+[m[32m    );[m
+[32m+[m[32m  }[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mFuture<bool> showLogoutDialog(BuildContext context) {[m
+[32m+[m[32m  return showDialog<bool>([m
+[32m+[m[32m    context: context,[m
+[32m+[m[32m    builder: (context) {[m
+[32m+[m[32m      return AlertDialog([m
+[32m+[m[32m        title: const Text('Sign out'),[m
+[32m+[m[32m        content: const Text('Are you sure you want to sign out?'),[m
+[32m+[m[32m        actions: [[m
+[32m+[m[32m          TextButton([m
+[32m+[m[32m              onPressed: () {[m
+[32m+[m[32m                Navigator.of(context).pop(false);[m
+[32m+[m[32m              },[m
+[32m+[m[32m              child: const Text('Cancel')),[m
+[32m+[m[32m          TextButton([m
+[32m+[m[32m              onPressed: () {[m
+[32m+[m[32m                Navigator.of(context).pop(true);[m
+[32m+[m[32m              },[m
+[32m+[m[32m              child: const Text('Log out'))[m
+[32m+[m[32m        ],[m
+[32m+[m[32m      );[m
+[32m+[m[32m    },[m
+[32m+[m[32m  ).then((value) => value ?? false);[m
+[32m+[m[32m}[m
+[1mdiff --git a/lib/views/register_view.dart b/lib/views/register_view.dart[m
+[1mindex 8740d77..57a0c8b 100644[m
+[1m--- a/lib/views/register_view.dart[m
+[1m+++ b/lib/views/register_view.dart[m
+[36m@@ -1,7 +1,7 @@[m
+ import 'package:firebase_auth/firebase_auth.dart';[m
+[31m-import 'package:firebase_core/firebase_core.dart';[m
+[32m+[m[32m// import 'package:firebase_core/firebase_core.dart';[m
+ import 'package:flutter/material.dart';[m
+[31m-import 'package:myworld/firebase_options.dart';[m
+[32m+[m[32m// import 'package:myworld/firebase_options.dart';[m
+ [m
+ class RegisterView extends StatefulWidget {[m
+   const RegisterView({super.key});[m
