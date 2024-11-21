@@ -1,3 +1,5 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:myworld/firebase_options.dart';
 import 'package:myworld/services/auth/auth_exceptions.dart';
 import 'package:myworld/services/auth/auth_user.dart';
 import 'package:myworld/services/auth/auth_provider.dart';
@@ -58,34 +60,34 @@ class FirebaseAuthProvider implements AuthProvider {
       throw UserNotLoggedInAuthException();
     }
 
-    @override
-    Future<AuthUser> login({
-      required String email,
-      required String password,
-    }) async {
-      try {
-        await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
-        final user = currentUser;
-        if (user != null) {
-          return user;
-        } else {
-          throw UserNotLoggedInAuthException();
-        }
-      } on FirebaseAuthException catch (e) {
-        if (e.code == 'user-not-found') {
-          throw UserNotFoundAuthException();
-        } else if (e.code == 'wrong-password') {
-          throw WrongPasswordAuthException();
-        } else {
-          throw GenericAuthException();
-        }
-      } catch (_) {
-        throw GenericAuthException();
-      }
-    }
+    // @override
+    // Future<AuthUser> login({
+    //   required String email,
+    //   required String password,
+    // }) async {
+    //   try {
+    //     await FirebaseAuth.instance.signInWithEmailAndPassword(
+    //       email: email,
+    //       password: password,
+    //     );
+    //     final user = currentUser;
+    //     if (user != null) {
+    //       return user;
+    //     } else {
+    //       throw UserNotLoggedInAuthException();
+    //     }
+    //   } on FirebaseAuthException catch (e) {
+    //     if (e.code == 'user-not-found') {
+    //       throw UserNotFoundAuthException();
+    //     } else if (e.code == 'wrong-password') {
+    //       throw WrongPasswordAuthException();
+    //     } else {
+    //       throw GenericAuthException();
+    //     }
+    //   } catch (_) {
+    //     throw GenericAuthException();
+    //   }
+    // }
 
     @override
     Future<void> sendEmailVerification() async {
@@ -96,5 +98,47 @@ class FirebaseAuthProvider implements AuthProvider {
         throw UserNotLoggedInAuthException();
       }
     }
+  }
+
+  @override
+  Future<void> initialize() async {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  }
+
+  @override
+  Future<AuthUser> login({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      final user = currentUser;
+      if (user != null) {
+        return user;
+      } else {
+        throw UserNotLoggedInAuthException();
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        throw UserNotFoundAuthException();
+      } else if (e.code == 'wrong-password') {
+        throw WrongPasswordAuthException();
+      } else {
+        throw GenericAuthException();
+      }
+    } catch (_) {
+      throw GenericAuthException();
+    }
+  }
+
+  @override
+  Future<void> sendEmailVerification() {
+    // TODO: implement sendEmailVerification
+    throw UnimplementedError();
   }
 }
